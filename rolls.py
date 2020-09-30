@@ -219,6 +219,22 @@ def replace_lowest_stat(stats, m=18):
     return [m] + sorted(stats)[1:]
 
 
+def run(n, s, name, dice_agg=sum, 
+        stat_adj=0, stat_select=lambda x: x):
+        
+    n = [int(val) for val in n.replace(' ', '').split('\n')]
+    s = [list(map(int,die.replace(' ', '').split(','))) for die in s.strip().split('\n')]
+    dice = get_dice(n, s)
+    rolls = get_rolls(dice, dice_agg)
+    roll_probs = calculate_roll_probs(rolls)
+    stat_probs, mod_roll_probs = \
+        calculate_stats(roll_probs, 6+stat_adj, stat_select)
+
+    dice_plot(mod_roll_probs, 'Individual Stats of ' + name)
+    
+    stat_plot(stat_probs, 'Cumulative Stats of ' + name)
+    
+    
 def dice_plot(probs, title=''):
     '''
     Function to plot roll probs
@@ -276,8 +292,8 @@ def dice_plot(probs, title=''):
     )
 
     fig.show()
-
-
+    
+    
 def stat_plot(probs, title=''):
     '''
     Function to plot roll probs
