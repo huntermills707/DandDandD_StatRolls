@@ -205,7 +205,7 @@ def drop_lowest_m_stat(stats, m=1):
     Returns:
         out (list): resulting stat set
     '''
-    return sorted(stats)[1:]
+    return sorted(stats)[m:]
 
 
 def replace_lowest_stat(stats, m=18):
