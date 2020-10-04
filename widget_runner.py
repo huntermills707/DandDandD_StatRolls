@@ -1,7 +1,7 @@
 from rolls import run, drop_lowest_m, drop_lowest_m_stat, replace_lowest_stat
 from ipywidgets import interact_manual, widgets, Layout
 
-def runRoller(n, s, name,
+def runRoller(name, n, s,
     roll, drop_roll,
     stat, drop_stat, replace_stat):
     

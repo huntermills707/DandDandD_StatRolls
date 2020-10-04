@@ -277,7 +277,7 @@ def dice_plot(probs, title=''):
 
     fig.update_layout(
         autosize=False,
-        width=800,
+        width=1000,
         height=400,
         title={
             'text': title,
@@ -336,7 +336,7 @@ def stat_plot(probs, title=''):
 
     fig.update_layout(
         autosize=False,
-        width=800,
+        width=1000,
         height=400,
         title={
             'text': title,
