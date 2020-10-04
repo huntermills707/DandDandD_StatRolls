@@ -11,11 +11,9 @@ def runRoller(n, s, name,
         dice_agg=sum
         
     if stat == 'Drop Lowest Stat':
-        print(stat)
         stat_select = lambda x: drop_lowest_m_stat(x, drop_stat)
         stat_adj = drop_stat
     elif stat == 'Replace Lowest Stat':
-        print(stat)
         stat_select = lambda x: replace_lowest_stat(x, replace_stat)
         stat_adj=0
     else:
@@ -42,6 +40,7 @@ def run_widget():
     
     roll = widgets.ToggleButtons(
         options=['Keep All', 'Drop Lowest Roll'],
+        value='Drop Lowest Roll',
         description='Roll Modifications:',
         style = {'description_width': 'initial'},
         disabled=False,
@@ -62,7 +61,8 @@ def run_widget():
 
     stat = widgets.ToggleButtons(
         options=['Keep All', 'Drop Lowest Stat', 'Replace Lowest Stat'],
-        description='Roll Modifications:',
+        value='Drop Lowest Stat',
+        description='Stat Modifications:',
         style = {'description_width': 'initial'},
         disabled=False,
         button_style='', # 'success', 'info', 'warning', 'danger' or ''
@@ -91,8 +91,17 @@ def run_widget():
         disabled=False,
     )
 
+    name = widgets.Textarea(
+        value='Roll 1d12 + 2d6 Drop Lowest Roll x 7 Drop Lowest Stat',
+        placeholder='Type something',
+        description='Name of Variant:',
+        disabled=False,
+        style = {'description_width': 'initial', 'width':'10%'},
+        layout = Layout(width='50%')
+    )
+        
     n = widgets.Textarea(
-        value='3',
+        value='1\n2',
         placeholder='Type something',
         description='Number of each Dice',
         disabled=False,
@@ -101,7 +110,7 @@ def run_widget():
     )
 
     s = widgets.Textarea(
-        value='1,2,3,4,5,6',
+        value='1,2,3,4,5,6,7,8,9,10,11,12\n1,2,3,4,5,6',
         placeholder='Type something',
         description='Sides of each Dice ',
         disabled=False,
@@ -109,18 +118,8 @@ def run_widget():
         layout = Layout(width='50%', height='100px')
     )
 
-    name = widgets.Text(
-        value='Roll 3d6',
-        placeholder='Type something',
-        description='Title of Policy ',
-        disabled=False,
-        style = {'description_width': 'initial', 'width':'10%'},
-        layout = Layout(width='50%')
-    )
-
-
-    interact_manual(runRoller ,n=n, s=s,
+    interact_manual(runRoller ,name=name, n=n, s=s,
                     roll=roll, drop_roll=drop_roll,
                     stat=stat, drop_stat=drop_stat, 
-                    replace_stat=replace_stat, name=name)
+                    replace_stat=replace_stat)
     
