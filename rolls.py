@@ -4,6 +4,7 @@ from math import factorial
 
 import plotly.graph_objects as go
 
+print("WELCOME TO DUNGEON AND DRAGONS DICE ROLLING")
 
 def get_dice(ns, sidess):
     '''
