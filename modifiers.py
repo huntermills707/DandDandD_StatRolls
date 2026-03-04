@@ -1,3 +1,19 @@
+def drop_interval(roll, low=0, high=0, agg=sum):
+    '''
+    Helper function to drop edges from a roll
+ 
+    Parameters:
+        roll (list): list of ints of a roll
+        low (int): number of lowest to drop
+        high (int): number of higest to drop
+        agg (func): function to aggregate roll
+
+    Returns:
+        out (int): value of roll
+    '''
+    return agg(sorted(roll)[low:high])
+
+
 def drop_lowest_m(roll, agg=sum, m=1):
     '''
     Helper function to drop lowest value from a roll

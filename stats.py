@@ -2,6 +2,7 @@ from itertools import product, combinations_with_replacement
 from collections import Counter, defaultdict
 from math import factorial
 
+from modifiers import drop_interval
 
 def get_rolls(dice, f=sum):
     '''
@@ -36,12 +37,14 @@ def get_roll_probs(nobs, rolls):
     return probs
 
 
-def calculate_roll(dice, f=sum):
+def calculate_roll(dice, low, high, agg=sum):
     '''
     Function to calculate probability of a specific value for a pool of dice
 
     Parameters:
         dice (list of list of int/float): input dice pool
+        low (int): number of lowest to drop
+        high (int): number of higest to drop
         f (function): aggregation function for dice roll instance
 
     Returns:
@@ -49,6 +52,8 @@ def calculate_roll(dice, f=sum):
         roll_cprobs (dict of float): cumlative probability of a specific value
     '''
     # get probs
+    high = len(dice) - high
+    f = lambda x: drop_interval(x, low, high, agg)
     nobs, rolls = get_rolls(dice, f)
     roll_probs = get_roll_probs(nobs, rolls)
 

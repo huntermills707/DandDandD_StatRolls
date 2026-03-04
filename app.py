@@ -17,13 +17,21 @@ app.layout = html.Div([
     html.Div([
         html.Label('Sides:', style={'marginRight': '5px'}),
         dcc.Input(id='new-die-sides', type='number', min=1, max=100, value=6, style={'width': '60px', 'marginRight': '10px'}),
-        html.Button('Add Die', id='add-die-btn', n_clicks=0),
+        html.Button('Add Die', id='add-die-btn', n_clicks=0, style={'marginRight': '10px'}),
+        html.Label('Drop Lowest:', style={'marginRight': '5px'}),
+        dcc.Input(id='drop-lowest', type='number', min=0, max=100, value=0, style={'width': '60px', 'marginRight': '10px'}),
+        html.Label('Drop Highest:', style={'marginRight': '5px'}),
+        dcc.Input(id='drop-highest', type='number', min=0, max=100, value=0, style={'width': '60px', 'marginRight': '10px'}),
         html.Button('Calculate', id='roll-btn', n_clicks=0, 
                    style={'marginLeft': '20px', 'backgroundColor': '#4CAF50', 'color': 'white'})
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
 
     # Dice container - vertical stack
-    html.Div(id='dice-container', style={'display': 'flex', 'flexDirection': 'column', 'gap': '10px'}),
+    html.Div(id='dice-container',
+         style={'display': 'grid',
+                'gridTemplateColumns': 'repeat(2, 1fr)',
+                'gap': '15px',
+                'alignItems': 'start'}),
 
     # Results display
     html.Div(id='roll-results', style={'display': 'flex', 'flexDirection': 'row', 'gap': '10px'})
@@ -106,31 +114,30 @@ def update_dice_store(add_clicks, remove_clicks, sides_values, side_values, curr
 )
 def render_dice(dice_data):
     if not dice_data:
-        return html.Em("No dice in pool. Click 'Add Die' to start.")
+        return html.Em("No dice in pool. Click 'Add Die' to start.") 
 
     dice_elements = []
 
     for i, die in enumerate(dice_data):
-        # Horizontal layout for side value inputs - no labels
-        side_inputs = []
-        for j, value in enumerate(die['values']):
-            side_inputs.append(
-                dcc.Input(
-                    type='number',
-                    value=value,
-                    id={'type': 'side-value-input', 'index': i, 'side': j},
-                    style={
-                        'width': '50px', 
-                        'textAlign': 'center',
-                        'marginRight': '8px',
-                        'marginBottom': '5px'
-                    }
-                )
+        # ---------- side inputs ----------
+        side_inputs = [
+            dcc.Input(
+                type='number',
+                value=value,
+                id={'type': 'side-value-input', 'index': i, 'side': j},
+                style={
+                    'width': '50px',
+                    'textAlign': 'center',
+                    'marginRight': '8px',
+                    'marginBottom': '5px'
+                }
             )
+            for j, value in enumerate(die['values'])
+        ]
 
-        # Die card - full width, compact height
+        # ---------- die card ----------
         die_card = html.Div([
-            # Header row with title, sides control, and remove button
+            # Header row
             html.Div([
                 html.Strong(f'Die #{i+1}', style={'minWidth': '60px'}),
 
@@ -146,9 +153,12 @@ def render_dice(dice_data):
                     )
                 ], style={'display': 'flex', 'alignItems': 'center', 'marginLeft': '20px'}),
 
-                html.Button('×', id={'type': 'remove-die-btn', 'index': i}, 
-                          style={'marginLeft': 'auto', 'color': 'red', 'cursor': 'pointer', 'fontSize': '16px'})
-
+                html.Button('×',
+                            id={'type': 'remove-die-btn', 'index': i},
+                            style={'marginLeft': 'auto',
+                                   'color': 'red',
+                                   'cursor': 'pointer',
+                                   'fontSize': '16px'})
             ], style={
                 'display': 'flex',
                 'alignItems': 'center',
@@ -157,19 +167,18 @@ def render_dice(dice_data):
                 'marginBottom': '8px'
             }),
 
-            # Side values - horizontal clean inputs
-            html.Div(side_inputs, style={
-                'display': 'flex',
-                'flexWrap': 'wrap',
-                'overflowX': 'auto',
-                'paddingTop': '5px'
-            })
-
+            # Side values
+            html.Div(side_inputs,
+                     style={'display': 'flex',
+                            'flexWrap': 'wrap',
+                            'overflowX': 'auto',
+                            'paddingTop': '5px'})
         ], style={
             'border': '1px solid #ddd',
             'borderRadius': '5px',
             'padding': '12px',
-            'backgroundColor': '#f9f9f9'
+            'backgroundColor': '#f9f9f9',
+            'width': '95%',
         })
 
         dice_elements.append(die_card)
@@ -182,19 +191,24 @@ def render_dice(dice_data):
     Output('roll-results', 'children'),
     Input('roll-btn', 'n_clicks'),
     State('dice-store', 'data'),
+    State('drop-lowest', 'value'),
+    State('drop-highest', 'value'),
     prevent_initial_call=True
 )
-def roll_dice(n_clicks, dice_data):
+def roll_dice(n_clicks, dice_data, drop_lowest, drop_highest):
     if not dice_data:
         return html.Div("No dice to roll!", style={'color': 'red'})
 
+    if drop_lowest + drop_highest >= len(dice_data):
+        return html.Div("Dropping too many Dice!", style={'color': 'red'})
+
     dice = [die['values'] for die in dice_data]
 
-    roll_probs, roll_cprobs = calculate_roll(dice)
+    roll_probs, roll_cprobs = calculate_roll(dice, drop_lowest, drop_highest)
 
     return dcc.Graph('probs', figure=plot(roll_probs, title='Roll Probabilities')), \
            dcc.Graph('cprobs', figure=plot(roll_cprobs, title='Cumulative Roll Probailites', moments=False))
-    
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
