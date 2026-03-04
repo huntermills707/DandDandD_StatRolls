@@ -1,7 +1,5 @@
 ## Dungeon and Dragons Stat Simulator
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/huntermills707/DandDandD_StatRolls/HEAD?urlpath=%2Fvoila%2Frender%2Froll_widget.ipynb)
-
 There are many variations of house rules in regard to stat generation in Dungeons and Dragons.
 Each variant has a different effect on how stats are distributed among PCs and NPCs assuming the stats are generated randomly (IE not via point buy). These house rules can have a significant effect on game play because these stats directly effect in game roll modifiers. Some variants may be highly variable, so some PCs could be significantly weaker than others. This could be fun, but it does depend on playstyle.
 
@@ -16,6 +14,3 @@ Both graphics also include the following statistical measures (not to be confuse
 2. Standard Deviation: This measure how widely results vary. A larger value means it varies more, and a smaller value varies less.
 3. Skewness: This measure the shape of the results. Roughly, if the peak of the curve is greater than the mean, the skew is negative, and if the peak of the curve is less than the mean, the skew is negative. In the case where the peak is the mean, the skew is zero.
 4. Kurtosis: This measure how the rate of how often values that significantly deviate from the mean occur (outliers). Higher values yield more outliers.
-
-Available at:
-https://mybinder.org/v2/gh/huntermills707/DandDandD_StatRolls/HEAD?urlpath=%2Fvoila%2Frender%2Froll_widget.ipynb
