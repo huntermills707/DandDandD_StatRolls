@@ -34,7 +34,11 @@ app.layout = html.Div([
                 'alignItems': 'start'}),
 
     # Results display
-    html.Div(id='roll-results', style={'display': 'flex', 'flexDirection': 'row', 'gap': '10px'})
+    html.Div(id='roll-results',
+            style={'display': 'grid',
+                'gridTemplateColumns': 'repeat(2, 1fr)',
+                'gap': '15px',
+                'alignItems': 'start'}),
 ])
 
 
@@ -206,9 +210,17 @@ def roll_dice(n_clicks, dice_data, drop_lowest, drop_highest):
 
     roll_probs, roll_cprobs = calculate_roll(dice, drop_lowest, drop_highest)
 
-    return dcc.Graph('probs', figure=plot(roll_probs, title='Roll Probabilities')), \
-           dcc.Graph('cprobs', figure=plot(roll_cprobs, title='Cumulative Roll Probailites', moments=False))
-
-
+    return [
+            html.Div(dcc.Graph('probs', figure=plot(roll_probs, title='Roll Probabilities')),
+                style={
+                    'padding': '12px',
+                    'width': '95%',
+            }),
+            html.Div(dcc.Graph('cprobs', figure=plot(roll_cprobs, title='Cumulative Roll Probailites', moments=False)),
+                style={
+                    'padding': '12px',
+                    'width': '95%',
+            }),
+        ]
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
