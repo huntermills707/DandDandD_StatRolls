@@ -2,7 +2,8 @@ import dash
 from dash import html, dcc, Input, Output, State, ALL, ctx
 import json
 
-from stats import calculate_roll
+from modifiers import stat_mod 
+from stats import calculate_roll, calculate_stats
 from plots import plot
 
 app = dash.Dash(__name__)
@@ -35,6 +36,32 @@ app.layout = html.Div([
 
     # Results display
     html.Div(id='roll-results',
+            style={'display': 'grid',
+                'gridTemplateColumns': 'repeat(2, 1fr)',
+                'gap': '15px',
+                'alignItems': 'start'}),
+
+    html.H1("Stat Outcome Probabilities"),
+
+    # Controls
+    html.Div([
+        html.Label('Number of Stats:', style={'marginRight': '5px'}),
+        dcc.Input(id='n-stats', type='number', min=0, max=10, value=6, style={'width': '60px', 'marginRight': '10px'}),
+        html.Label('Drop Lowest Stat:', style={'marginRight': '5px'}),
+        dcc.Input(id='drop-lowest-stat', type='number', min=0, max=100, value=0, style={'width': '60px', 'marginRight': '10px'}),
+        html.Label('Drop Highest Stat:', style={'marginRight': '5px'}),
+        dcc.Input(id='drop-highest-stat', type='number', min=0, max=100, value=0, style={'width': '60px', 'marginRight': '10px'}),
+        html.Label('Replace Lowest:', style={'marginRight': '5px'}),
+        dcc.Checklist(id='replace-lowest-toggle', options=[''], value=[]),
+        dcc.Input(id='replace-lowest-value', min=0, max=100, value=18, style={'width': '60px', 'marginRight': '10px'}),
+        html.Label('Replace Highest:', style={'marginRight': '5px'}),
+        dcc.Checklist(id='replace-highest-toggle', options=[''], value=[]),
+        dcc.Input(id='replace-highest-value', min=0, max=100, value=6, style={'width': '60px', 'marginRight': '10px'}),
+
+    ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
+
+    # Results display
+    html.Div(id='stat-results',
             style={'display': 'grid',
                 'gridTemplateColumns': 'repeat(2, 1fr)',
                 'gap': '15px',
@@ -222,5 +249,54 @@ def roll_dice(n_clicks, dice_data, drop_lowest, drop_highest):
                     'width': '95%',
             }),
         ]
+
+@app.callback(
+    Output('stat-results', 'children'),
+    Input('roll-btn', 'n_clicks'),
+    State('dice-store', 'data'),
+    State('n-stats', 'value'),
+    State('drop-lowest', 'value'),
+    State('drop-highest', 'value'),
+    State('drop-lowest-stat', 'value'),
+    State('drop-highest-stat', 'value'),
+    State('replace-lowest-toggle', 'value'),
+    State('replace-lowest-value', 'value'),
+    State('replace-highest-toggle', 'value'),
+    State('replace-highest-value', 'value'),
+    prevent_initial_call=True
+)
+def stat_results(n_clicks, dice_data, z, drop_lowest, drop_highest, drop_lowest_stat, drop_highest_stat,
+               replace_lowest_bool, replace_lowest_value, replace_highest_bool, replace_highest_value):
+    if not dice_data:
+        return html.Div("No dice to roll!", style={'color': 'red'})
+
+    if drop_lowest + drop_highest >= len(dice_data):
+        return html.Div("Dropping too many Dice!", style={'color': 'red'})
+
+    dice = [die['values'] for die in dice_data]
+
+    roll_probs, _ = calculate_roll(dice, drop_lowest, drop_highest)
+
+    f = lambda x: stat_mod(x,
+                           drop_lowest_stat,
+                           z + drop_lowest_stat - drop_highest_stat,
+                           replace_lowest_value if replace_lowest_bool else None,
+                           replace_highest_value if replace_highest_bool else None)
+    z_mod = z + drop_lowest_stat + drop_highest_stat
+    stat_probs, roll_probs_mod = calculate_stats(roll_probs, z=z, z_mod=z_mod, f=f)
+
+    return [
+            html.Div(dcc.Graph('probs_mod', figure=plot(roll_probs_mod, title='Modified Stat Probabilities')),
+                style={
+                    'padding': '12px',
+                    'width': '95%',
+            }),
+            html.Div(dcc.Graph('stats', figure=plot(stat_probs, title='Stat Total Probailites')),
+                style={
+                    'padding': '12px',
+                    'width': '95%',
+            }),
+        ]
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(port=8051, host='0.0.0.0')

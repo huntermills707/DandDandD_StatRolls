@@ -14,6 +14,19 @@ def drop_interval(roll, low=0, high=0, agg=sum):
     return agg(sorted(roll)[low:high])
 
 
+def stat_mod(roll, low_drop, high_drop, low_replace, high_replace):
+    '''
+    Helper function to modify stat roll outcome
+    '''
+    roll = sorted(roll)
+    roll = roll[low_drop:high_drop]
+    if low_replace != None:
+        roll = [low_replace] + roll[1:]
+    if high_replace != None:
+        roll = roll[:-1] + [high_replace]
+    return roll
+
+
 def drop_lowest_m(roll, agg=sum, m=1):
     '''
     Helper function to drop lowest value from a roll

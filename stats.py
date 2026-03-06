@@ -104,7 +104,7 @@ def get_stat_dup(stats):
     return dup
 
 
-def calculate_stats(probs, z=6, f=lambda x: x):
+def calculate_stats(probs, z=6, z_mod=6, f=lambda x: x):
     '''
     Function to calculate stats given roll probabilities, number of stats, and stat rule
     
@@ -122,7 +122,7 @@ def calculate_stats(probs, z=6, f=lambda x: x):
     combo_probs = defaultdict(float)
     
     # iterate over combinations (more efficient that brute force)
-    for stats in combinations_with_replacement(span, z):
+    for stats in combinations_with_replacement(span, z_mod):
         # update probability of a combo (combos can repeat with things like drop value)
         combo_probs[tuple(sorted(f(stats)))] += \
             get_stat_prob(stats, probs) * get_stat_dup(stats)
@@ -135,7 +135,7 @@ def calculate_stats(probs, z=6, f=lambda x: x):
         stat_probs[stat_sum] += c_prob
         for stat in stats:
             # normalize by number of stats
-            roll_probs[stat] += c_prob / z            
+            roll_probs[stat] += c_prob / z
     return stat_probs, roll_probs
 
 
