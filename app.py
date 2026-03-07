@@ -12,15 +12,17 @@ app.layout = html.Div([
     html.H1("Dice Pool Probabilities"), 
 
     # Store for dice configuration
-    dcc.Store(id='dice-store', data=[]),
-
+    dcc.Store(id='dice-store', data=[{'sides': 6, 'values': [1,2,3,4,5,6]},
+                                     {'sides': 6, 'values': [1,2,3,4,5,6]},
+                                     {'sides': 6, 'values': [1,2,3,4,5,6]},
+                                     {'sides': 6, 'values': [1,2,3,4,5,6]}]),
     # Controls
     html.Div([
         html.Label('Sides:', style={'marginRight': '5px'}),
         dcc.Input(id='new-die-sides', type='number', min=1, max=100, value=6, style={'width': '60px', 'marginRight': '10px'}),
         html.Button('Add Die', id='add-die-btn', n_clicks=0, style={'marginRight': '10px'}),
         html.Label('Drop Lowest:', style={'marginRight': '5px'}),
-        dcc.Input(id='drop-lowest', type='number', min=0, max=100, value=0, style={'width': '60px', 'marginRight': '10px'}),
+        dcc.Input(id='drop-lowest', type='number', min=0, max=100, value=1, style={'width': '60px', 'marginRight': '10px'}),
         html.Label('Drop Highest:', style={'marginRight': '5px'}),
         dcc.Input(id='drop-highest', type='number', min=0, max=100, value=0, style={'width': '60px', 'marginRight': '10px'}),
         html.Button('Calculate', id='roll-btn', n_clicks=0, 
@@ -34,7 +36,7 @@ app.layout = html.Div([
         html.Label('Number of Stats:', style={'marginRight': '5px'}),
         dcc.Input(id='n-stats', type='number', min=0, max=10, value=6, style={'width': '60px', 'marginRight': '10px'}),
         html.Label('Drop Lowest Stat:', style={'marginRight': '5px'}),
-        dcc.Input(id='drop-lowest-stat', type='number', min=0, max=100, value=0, style={'width': '60px', 'marginRight': '10px'}),
+        dcc.Input(id='drop-lowest-stat', type='number', min=0, max=100, value=1, style={'width': '60px', 'marginRight': '10px'}),
         html.Label('Drop Highest Stat:', style={'marginRight': '5px'}),
         dcc.Input(id='drop-highest-stat', type='number', min=0, max=100, value=0, style={'width': '60px', 'marginRight': '10px'}),
         html.Label('Replace Lowest:', style={'marginRight': '5px'}),
@@ -239,7 +241,6 @@ def render_dice(dice_data):
     State('replace-lowest-value', 'value'),
     State('replace-highest-toggle', 'value'),
     State('replace-highest-value', 'value'),
-    prevent_initial_call=True
 )
 def stat_results(n_clicks, dice_data, z, drop_lowest, drop_highest, drop_lowest_stat, drop_highest_stat,
                replace_lowest_bool, replace_lowest_value, replace_highest_bool, replace_highest_value):
