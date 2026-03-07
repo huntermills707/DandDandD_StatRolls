@@ -29,7 +29,10 @@ app.layout = html.Div([
                    style={'marginLeft': '20px', 'backgroundColor': '#4CAF50', 'color': 'white'})
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
 
-    html.H2("Stat Outcome Modifiers"),
+    html.Div([
+     html.Label('Enable Stat Outcome Calculations:', style={'marginRight': '5px', 'font-size': '20px', 'font-weight': 'bold'}),
+     dcc.Checklist(id='stat-toggle', options=[''], value=['']),
+    ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
 
     # Controls
     html.Div([
@@ -232,6 +235,7 @@ def render_dice(dice_data):
     Output('stat-results', 'children'),
     Input('roll-btn', 'n_clicks'),
     State('dice-store', 'data'),
+    State('stat-toggle', 'value'),
     State('n-stats', 'value'),
     State('drop-lowest', 'value'),
     State('drop-highest', 'value'),
@@ -242,7 +246,7 @@ def render_dice(dice_data):
     State('replace-highest-toggle', 'value'),
     State('replace-highest-value', 'value'),
 )
-def stat_results(n_clicks, dice_data, z, drop_lowest, drop_highest, drop_lowest_stat, drop_highest_stat,
+def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest, drop_highest, drop_lowest_stat, drop_highest_stat,
                replace_lowest_bool, replace_lowest_value, replace_highest_bool, replace_highest_value):
     if not dice_data:
         return html.Div("No dice to roll!", style={'color': 'red'})
@@ -253,6 +257,16 @@ def stat_results(n_clicks, dice_data, z, drop_lowest, drop_highest, drop_lowest_
     dice = [die['values'] for die in dice_data]
 
     roll_probs, roll_cprobs = calculate_roll(dice, drop_lowest, drop_highest)
+
+    print(stat_enable)
+
+    if not stat_enable:
+        return [html.Div(dcc.Graph('probs', figure=plot(roll_probs, title='Roll Probabilities')),
+                    style={'padding': '12px', 'width': '95%'}),
+                html.Div(dcc.Graph('cprobs', figure=plot(roll_cprobs, title='Cumulative Roll Probailites', moments=False)),
+                    style={'padding': '12px', 'width': '95%'})], \
+               None, \
+               None
 
     f = lambda x: stat_mod(x,
                            drop_lowest_stat,
