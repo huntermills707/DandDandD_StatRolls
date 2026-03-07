@@ -69,7 +69,7 @@ def plot(probs, title='', moments=True):
         xaxis = {
             'tickmode': 'linear',
             'tick0': min(x) - min(x)%2,
-            'dtick': 1}
+            'dtick': 1 + (max(x) - min(x)) // 24}
     )
 
     return fig

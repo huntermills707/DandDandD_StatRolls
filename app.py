@@ -27,21 +27,7 @@ app.layout = html.Div([
                    style={'marginLeft': '20px', 'backgroundColor': '#4CAF50', 'color': 'white'})
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
 
-    # Dice container - vertical stack
-    html.Div(id='dice-container',
-         style={'display': 'grid',
-                'gridTemplateColumns': 'repeat(2, 1fr)',
-                'gap': '15px',
-                'alignItems': 'start'}),
-
-    # Results display
-    html.Div(id='roll-results',
-            style={'display': 'grid',
-                'gridTemplateColumns': 'repeat(2, 1fr)',
-                'gap': '15px',
-                'alignItems': 'start'}),
-
-    html.H1("Stat Outcome Probabilities"),
+    html.H2("Stat Outcome Modifiers"),
 
     # Controls
     html.Div([
@@ -57,13 +43,33 @@ app.layout = html.Div([
         html.Label('Replace Highest:', style={'marginRight': '5px'}),
         dcc.Checklist(id='replace-highest-toggle', options=[''], value=[]),
         dcc.Input(id='replace-highest-value', min=0, max=100, value=6, style={'width': '60px', 'marginRight': '10px'}),
-
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
+
+    #Dice container - vertical stack
+    html.Div(id='dice-container',
+         style={'display': 'grid',
+                'gridTemplateColumns': 'repeat(2, 1fr)',
+                'gap': '15px',
+                'alignItems': 'start'}),
+
+    # Results display
+    html.Div(id='roll-results',
+            style={'display': 'grid',
+                'gridTemplateColumns': 'repeat(2, 1fr)',
+                'gap': '15px',
+                'alignItems': 'start'}),
+
+    # Results display
+    html.Div(id='roll-mod-results',
+            style={'display': 'grid',
+                'gridTemplateColumns': 'repeat(2, 1fr)',
+                'gap': '15px',
+                'alignItems': 'start'}),
 
     # Results display
     html.Div(id='stat-results',
             style={'display': 'grid',
-                'gridTemplateColumns': 'repeat(2, 1fr)',
+                'gridTemplateColumns': 'repeat(1, 1fr)',
                 'gap': '15px',
                 'alignItems': 'start'}),
 ])
@@ -220,37 +226,7 @@ def render_dice(dice_data):
 # Roll the dice pool
 @app.callback(
     Output('roll-results', 'children'),
-    Input('roll-btn', 'n_clicks'),
-    State('dice-store', 'data'),
-    State('drop-lowest', 'value'),
-    State('drop-highest', 'value'),
-    prevent_initial_call=True
-)
-def roll_dice(n_clicks, dice_data, drop_lowest, drop_highest):
-    if not dice_data:
-        return html.Div("No dice to roll!", style={'color': 'red'})
-
-    if drop_lowest + drop_highest >= len(dice_data):
-        return html.Div("Dropping too many Dice!", style={'color': 'red'})
-
-    dice = [die['values'] for die in dice_data]
-
-    roll_probs, roll_cprobs = calculate_roll(dice, drop_lowest, drop_highest)
-
-    return [
-            html.Div(dcc.Graph('probs', figure=plot(roll_probs, title='Roll Probabilities')),
-                style={
-                    'padding': '12px',
-                    'width': '95%',
-            }),
-            html.Div(dcc.Graph('cprobs', figure=plot(roll_cprobs, title='Cumulative Roll Probailites', moments=False)),
-                style={
-                    'padding': '12px',
-                    'width': '95%',
-            }),
-        ]
-
-@app.callback(
+    Output('roll-mod-results', 'children'),
     Output('stat-results', 'children'),
     Input('roll-btn', 'n_clicks'),
     State('dice-store', 'data'),
@@ -275,7 +251,7 @@ def stat_results(n_clicks, dice_data, z, drop_lowest, drop_highest, drop_lowest_
 
     dice = [die['values'] for die in dice_data]
 
-    roll_probs, _ = calculate_roll(dice, drop_lowest, drop_highest)
+    roll_probs, roll_cprobs = calculate_roll(dice, drop_lowest, drop_highest)
 
     f = lambda x: stat_mod(x,
                            drop_lowest_stat,
@@ -284,19 +260,24 @@ def stat_results(n_clicks, dice_data, z, drop_lowest, drop_highest, drop_lowest_
                            replace_highest_value if replace_highest_bool else None)
     z_mod = z + drop_lowest_stat + drop_highest_stat
     stat_probs, roll_probs_mod = calculate_stats(roll_probs, z=z, z_mod=z_mod, f=f)
+ 
+    order = sorted(roll_probs_mod.keys())
+    roll_cprobs_mod = {order[0]: roll_probs_mod[order[0]]}
+    for i in range(len(order)-1):
+        i = order[i]
+        roll_cprobs_mod[i+1] = roll_cprobs_mod[i] + roll_probs_mod[i+1]
 
-    return [
-            html.Div(dcc.Graph('probs_mod', figure=plot(roll_probs_mod, title='Modified Stat Probabilities')),
-                style={
-                    'padding': '12px',
-                    'width': '95%',
-            }),
-            html.Div(dcc.Graph('stats', figure=plot(stat_probs, title='Stat Total Probailites')),
-                style={
-                    'padding': '12px',
-                    'width': '95%',
-            }),
-        ]
+    return [html.Div(dcc.Graph('probs', figure=plot(roll_probs, title='Roll Probabilities')),
+                style={'padding': '12px', 'width': '95%'}),
+            html.Div(dcc.Graph('cprobs', figure=plot(roll_cprobs, title='Cumulative Roll Probailites', moments=False)),
+                style={'padding': '12px', 'width': '95%'})], \
+           [html.Div(dcc.Graph('probs_mod', figure=plot(roll_probs_mod, title='Modified Roll Probabilities')),
+                style={'padding': '12px', 'width': '95%'}),
+            html.Div(dcc.Graph('stats', figure=plot(roll_cprobs_mod, title='Cumulative Modified Roll Probailites', moments=False)),
+                style={'padding': '12px', 'width': '95%',})], \
+           [html.Div(dcc.Graph('stats', figure=plot(stat_probs, title='Stat Total Probailites')),
+                style={'padding': '12px', 'width': '95%',})]
+
 
 if __name__ == '__main__':
     app.run(port=8051, host='0.0.0.0')
