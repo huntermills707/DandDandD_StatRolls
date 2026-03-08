@@ -11,12 +11,12 @@ app = dash.Dash(__name__)
 app.layout = html.Div([
     html.H1("Dice Pool Probabilities"), 
 
-    # Store for dice configuration
+    # dice store (default 4d6)
     dcc.Store(id='dice-store', data=[{'sides': 6, 'values': [1,2,3,4,5,6]},
                                      {'sides': 6, 'values': [1,2,3,4,5,6]},
                                      {'sides': 6, 'values': [1,2,3,4,5,6]},
                                      {'sides': 6, 'values': [1,2,3,4,5,6]}]),
-    # Controls
+    # Roll Controls
     html.Div([
         html.Label('Sides:', style={'marginRight': '5px'}),
         dcc.Input(id='new-die-sides', type='number', min=1, max=100, value=6,
@@ -34,13 +34,12 @@ app.layout = html.Div([
                            'color': 'white'})
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
 
+    # Stat Controls
     html.Div([
      html.Label('Enable Stat Outcome Calculations:',
                 style={'marginRight': '5px', 'font-size': '20px', 'font-weight': 'bold'}),
      dcc.Checklist(id='stat-toggle', options=[''], value=['']),
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
-
-    # Controls
     html.Div([
         html.Label('Number of Stats:', style={'marginRight': '5px'}),
         dcc.Input(id='n-stats', type='number', min=0, max=10, value=6,
@@ -61,28 +60,28 @@ app.layout = html.Div([
                   style={'width': '60px', 'marginRight': '10px'}),
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
 
-    #Dice container - vertical stack
+    # dice container (visualize dice store)
     html.Div(id='dice-container',
          style={'display': 'grid',
                 'gridTemplateColumns': 'repeat(2, 1fr)',
                 'gap': '15px',
                 'alignItems': 'start'}),
 
-    # Results display
+    # roll results display
     html.Div(id='roll-results',
             style={'display': 'grid',
                 'gridTemplateColumns': 'repeat(2, 1fr)',
                 'gap': '15px',
                 'alignItems': 'start'}),
 
-    # Results display
+    # modified roll results display
     html.Div(id='roll-mod-results',
             style={'display': 'grid',
                 'gridTemplateColumns': 'repeat(2, 1fr)',
                 'gap': '15px',
                 'alignItems': 'start'}),
 
-    # Results display
+    # stat results display
     html.Div(id='stat-results',
             style={'display': 'grid',
                 'gridTemplateColumns': 'repeat(1, 1fr)',
@@ -102,13 +101,14 @@ app.layout = html.Div([
     State('new-die-sides', 'value'),
     prevent_initial_call=True
 )
-def update_dice_store(add_clicks, remove_clicks, sides_values, side_values, current_data, new_die_sides):
+def update_dice_store(add_clicks, remove_clicks, sides_values, 
+                      side_values, current_data, new_die_sides):
     if not ctx.triggered:
         return current_data
 
     triggered_id = ctx.triggered_id
 
-    # Handle Add Die
+    # add die
     if triggered_id == 'add-die-btn':
         sides = new_die_sides if new_die_sides and new_die_sides > 0 else 6
         new_die = {
@@ -118,7 +118,7 @@ def update_dice_store(add_clicks, remove_clicks, sides_values, side_values, curr
         current_data.append(new_die)
         return current_data
 
-    # Handle Remove Die
+    # remove die
     if (isinstance(triggered_id, dict) and
         triggered_id.get('type') == 'remove-die-btn'):
 
@@ -127,7 +127,7 @@ def update_dice_store(add_clicks, remove_clicks, sides_values, side_values, curr
             current_data.pop(index_to_remove)
         return current_data
 
-    # Handle Sides Count Change (within card)
+    # n sides change within die card
     if (isinstance(triggered_id, dict) and
         triggered_id.get('type') == 'sides-input'):
 
@@ -152,7 +152,7 @@ def update_dice_store(add_clicks, remove_clicks, sides_values, side_values, curr
         current_data[die_index]['values'] = old_values
         return current_data
 
-    # Handle Individual Side Value Change
+    # individual side change
     if (isinstance(triggered_id, dict) and 
         triggered_id.get('type') == 'side-value-input'):
 
@@ -183,7 +183,7 @@ def render_die(i, die):
 
     # build die card
     die_card = html.Div([
-    # Header row
+        # header row
         html.Div([
             html.Strong(f'Die #{i+1}', style={'minWidth': '60px'}),
             html.Div([
@@ -204,13 +204,15 @@ def render_die(i, die):
                   'marginBottom': '8px'}
         ),
 
-        # Side values
+        # side values
         html.Div(side_inputs,
                  style={'display': 'flex', 'flexWrap': 'wrap',
                         'overflowX': 'auto', 'paddingTop': '5px'})
     ], style={'border': '1px solid #ddd', 'borderRadius': '5px', 
               'padding': '12px', 'backgroundColor': '#f9f9f9', 'width': '95%'}
     )
+    return die_card
+
 
 @app.callback(
     Output('dice-container', 'children'),
@@ -303,4 +305,4 @@ def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest,
 
 
 if __name__ == '__main__':
-    app.run(port=8051, host='0.0.0.0')
+    app.run(port=8050, host='0.0.0.0')
