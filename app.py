@@ -1,8 +1,8 @@
-import dash
-from dash import html, dcc, Input, Output, State, ALL, ctx
 import json
 
-from modifiers import stat_mod 
+import dash
+from dash import html, dcc, Input, Output, State, ALL, ctx
+
 from stats import calculate_roll, calculate_stats
 from plots import plot
 
@@ -247,7 +247,7 @@ def render_dice(dice_data):
     State('replace-highest-value', 'value'),
 )
 def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest, drop_highest, drop_lowest_stat, drop_highest_stat,
-               replace_lowest_bool, replace_lowest_value, replace_highest_bool, replace_highest_value):
+                 replace_lowest_bool, replace_lowest_value, replace_highest_bool, replace_highest_value):
     if not dice_data:
         return html.Div("No dice to roll!", style={'color': 'red'})
 
@@ -258,8 +258,6 @@ def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest, drop_highest,
 
     roll_probs, roll_cprobs = calculate_roll(dice, drop_lowest, drop_highest)
 
-    print(stat_enable)
-
     if not stat_enable:
         return [html.Div(dcc.Graph('probs', figure=plot(roll_probs, title='Roll Probabilities')),
                     style={'padding': '12px', 'width': '95%'}),
@@ -268,19 +266,11 @@ def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest, drop_highest,
                None, \
                None
 
-    f = lambda x: stat_mod(x,
-                           drop_lowest_stat,
-                           z + drop_lowest_stat - drop_highest_stat,
-                           replace_lowest_value if replace_lowest_bool else None,
-                           replace_highest_value if replace_highest_bool else None)
-    z_mod = z + drop_lowest_stat + drop_highest_stat
-    stat_probs, roll_probs_mod = calculate_stats(roll_probs, z=z, z_mod=z_mod, f=f)
- 
-    order = sorted(roll_probs_mod.keys())
-    roll_cprobs_mod = {order[0]: roll_probs_mod[order[0]]}
-    for i in range(len(order)-1):
-        i = order[i]
-        roll_cprobs_mod[i+1] = roll_cprobs_mod[i] + roll_probs_mod[i+1]
+    stat_probs, roll_probs_mod, roll_cprobs_mod = calculate_stats(
+                                                    roll_probs, z,
+                                                    drop_lowest_stat, drop_highest_stat,
+                                                    replace_lowest_bool, replace_lowest_value,
+                                                    replace_highest_bool, replace_highest_value)
 
     return [html.Div(dcc.Graph('probs', figure=plot(roll_probs, title='Roll Probabilities')),
                 style={'padding': '12px', 'width': '95%'}),
