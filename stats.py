@@ -1,5 +1,5 @@
-from itertools import product, combinations_with_replacement
 from collections import Counter, defaultdict
+from itertools import product, combinations_with_replacement
 from math import factorial
 
 from modifiers import drop_interval, stat_mod
@@ -66,8 +66,8 @@ def calculate_roll(dice, low, high, agg=sum):
         agg (function): aggregation function for dice roll instance
 
     Returns:
-        roll_probs (dict of float): probability of a specific value
-        roll_cprobs (dict of float): cumlative probability of a specific value
+        roll_probs (dict): probability of a specific value
+        roll_cprobs (dict): cumlative probability of a specific value
     '''
     # get probs
     high = len(dice) - high
@@ -162,19 +162,19 @@ def calculate_stats(roll_probs, z,
     Function to calculate stat probabilities
 
     Parameters:
-        roll_probs
-        z
-        drop_lowest_stat
-        drop_highest_stat
-        replace_lowest_bool
-        replace_lowest_value
-        replace_highest_bool
-        replace_highest_value
+        roll_probs (list): dict of probabilities of getting a roll
+        z (int): number of stats 
+        drop_lowest_stat (int): number of lowest stats to be dropped
+        drop_highest_stat (int): number of highest stats to be dropped
+        replace_lowest_bool (bool): select if lowest stat is replaced
+        replace_lowest_value (int): value to replace lowest stat
+        replace_highest_bool (bool): select if highest stat is replaced
+        replace_highest_value (int): value to replace higest stat
 
     Returns:
-        stat_probs
-        roll_probs_mod
-        roll_cprobs_mod
+        stat_probs (dict): dict of probabilities of getting a stat set (cumulative)
+        roll_probs_mod (dict): dict of probabilities of getting a roll (modified)
+        roll_cprobs_mod (dict): cumlative probability of a specific value (modified)
     '''
 
     # build stat modification function

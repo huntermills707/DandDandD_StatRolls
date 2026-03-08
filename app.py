@@ -19,35 +19,46 @@ app.layout = html.Div([
     # Controls
     html.Div([
         html.Label('Sides:', style={'marginRight': '5px'}),
-        dcc.Input(id='new-die-sides', type='number', min=1, max=100, value=6, style={'width': '60px', 'marginRight': '10px'}),
-        html.Button('Add Die', id='add-die-btn', n_clicks=0, style={'marginRight': '10px'}),
+        dcc.Input(id='new-die-sides', type='number', min=1, max=100, value=6,
+                  style={'width': '60px', 'marginRight': '10px'}),
+        html.Button('Add Die', id='add-die-btn', n_clicks=0,
+                    style={'marginRight': '10px'}),
         html.Label('Drop Lowest:', style={'marginRight': '5px'}),
-        dcc.Input(id='drop-lowest', type='number', min=0, max=100, value=1, style={'width': '60px', 'marginRight': '10px'}),
+        dcc.Input(id='drop-lowest', type='number', min=0, max=100, value=1,
+                  style={'width': '60px', 'marginRight': '10px'}),
         html.Label('Drop Highest:', style={'marginRight': '5px'}),
-        dcc.Input(id='drop-highest', type='number', min=0, max=100, value=0, style={'width': '60px', 'marginRight': '10px'}),
+        dcc.Input(id='drop-highest', type='number', min=0, max=100, value=0,
+                  style={'width': '60px', 'marginRight': '10px'}),
         html.Button('Calculate', id='roll-btn', n_clicks=0, 
-                   style={'marginLeft': '20px', 'backgroundColor': '#4CAF50', 'color': 'white'})
+                    style={'marginLeft': '20px', 'backgroundColor': '#4CAF50', 
+                           'color': 'white'})
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
 
     html.Div([
-     html.Label('Enable Stat Outcome Calculations:', style={'marginRight': '5px', 'font-size': '20px', 'font-weight': 'bold'}),
+     html.Label('Enable Stat Outcome Calculations:',
+                style={'marginRight': '5px', 'font-size': '20px', 'font-weight': 'bold'}),
      dcc.Checklist(id='stat-toggle', options=[''], value=['']),
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
 
     # Controls
     html.Div([
         html.Label('Number of Stats:', style={'marginRight': '5px'}),
-        dcc.Input(id='n-stats', type='number', min=0, max=10, value=6, style={'width': '60px', 'marginRight': '10px'}),
+        dcc.Input(id='n-stats', type='number', min=0, max=10, value=6,
+                  style={'width': '60px', 'marginRight': '10px'}),
         html.Label('Drop Lowest Stat:', style={'marginRight': '5px'}),
-        dcc.Input(id='drop-lowest-stat', type='number', min=0, max=100, value=1, style={'width': '60px', 'marginRight': '10px'}),
+        dcc.Input(id='drop-lowest-stat', type='number', min=0, max=100, value=1,
+                  style={'width': '60px', 'marginRight': '10px'}),
         html.Label('Drop Highest Stat:', style={'marginRight': '5px'}),
-        dcc.Input(id='drop-highest-stat', type='number', min=0, max=100, value=0, style={'width': '60px', 'marginRight': '10px'}),
+        dcc.Input(id='drop-highest-stat', type='number', min=0, max=100, value=0,
+                  style={'width': '60px', 'marginRight': '10px'}),
         html.Label('Replace Lowest:', style={'marginRight': '5px'}),
         dcc.Checklist(id='replace-lowest-toggle', options=[''], value=[]),
-        dcc.Input(id='replace-lowest-value', min=0, max=100, value=18, style={'width': '60px', 'marginRight': '10px'}),
+        dcc.Input(id='replace-lowest-value', min=0, max=100, value=18,
+                  style={'width': '60px', 'marginRight': '10px'}),
         html.Label('Replace Highest:', style={'marginRight': '5px'}),
         dcc.Checklist(id='replace-highest-toggle', options=[''], value=[]),
-        dcc.Input(id='replace-highest-value', min=0, max=100, value=6, style={'width': '60px', 'marginRight': '10px'}),
+        dcc.Input(id='replace-highest-value', min=0, max=100, value=6,
+                  style={'width': '60px', 'marginRight': '10px'}),
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
 
     #Dice container - vertical stack
@@ -108,18 +119,25 @@ def update_dice_store(add_clicks, remove_clicks, sides_values, side_values, curr
         return current_data
 
     # Handle Remove Die
-    if isinstance(triggered_id, dict) and triggered_id.get('type') == 'remove-die-btn':
+    if (isinstance(triggered_id, dict) and
+        triggered_id.get('type') == 'remove-die-btn'):
+
         index_to_remove = triggered_id['index']
         if 0 <= index_to_remove < len(current_data):
             current_data.pop(index_to_remove)
         return current_data
 
     # Handle Sides Count Change (within card)
-    if isinstance(triggered_id, dict) and triggered_id.get('type') == 'sides-input':
+    if (isinstance(triggered_id, dict) and
+        triggered_id.get('type') == 'sides-input'):
+
         die_index = triggered_id['index']
         new_sides = ctx.triggered[0]['value']
 
-        if new_sides is None or new_sides < 1 or die_index >= len(current_data):
+        if (new_sides is None or
+            new_sides < 1 or
+            die_index >= len(current_data)):
+
             return current_data
 
         old_values = current_data[die_index]['values']
@@ -135,7 +153,9 @@ def update_dice_store(add_clicks, remove_clicks, sides_values, side_values, curr
         return current_data
 
     # Handle Individual Side Value Change
-    if isinstance(triggered_id, dict) and triggered_id.get('type') == 'side-value-input':
+    if (isinstance(triggered_id, dict) and 
+        triggered_id.get('type') == 'side-value-input'):
+
         die_index = triggered_id['index']
         side_index = triggered_id['side']
         new_value = ctx.triggered[0]['value']
@@ -143,13 +163,55 @@ def update_dice_store(add_clicks, remove_clicks, sides_values, side_values, curr
         if (0 <= die_index < len(current_data) and 
             0 <= side_index < len(current_data[die_index]['values']) and 
             new_value is not None):
+
             current_data[die_index]['values'][side_index] = new_value
         return current_data
 
     return current_data
 
 
-# Render dice UI - vertical cards, horizontal clean inputs
+def render_die(i, die):
+    # build UI to for each side of a die
+    side_inputs = [
+        dcc.Input(type='number',
+                  value=value,
+                  id={'type': 'side-value-input', 'index': i, 'side': j},
+                  style={'width': '50px', 'textAlign': 'center',
+                         'marginRight': '8px', 'marginBottom': '5px'})
+        for j, value in enumerate(die['values'])
+    ]
+
+    # build die card
+    die_card = html.Div([
+    # Header row
+        html.Div([
+            html.Strong(f'Die #{i+1}', style={'minWidth': '60px'}),
+            html.Div([
+                html.Label('Sides:', style={'marginRight': '5px', 
+                                            'fontSize': '14px'}),
+                dcc.Input(type='number', min=1, max=100, value=die['sides'],
+                          id={'type': 'sides-input', 'index': i}, 
+                          style={'width': '60px'})
+            ], style={'display': 'flex', 'alignItems': 'center',
+                      'marginLeft': '20px'}),
+
+            html.Button('×',
+                        id={'type': 'remove-die-btn', 'index': i},
+                        style={'marginLeft': 'auto', 'color': 'red',
+                               'cursor': 'pointer', 'fontSize': '16px'})
+        ], style={'display': 'flex', 'alignItems': 'center',
+                  'borderBottom': '1px solid #eee', 'paddingBottom': '8px',
+                  'marginBottom': '8px'}
+        ),
+
+        # Side values
+        html.Div(side_inputs,
+                 style={'display': 'flex', 'flexWrap': 'wrap',
+                        'overflowX': 'auto', 'paddingTop': '5px'})
+    ], style={'border': '1px solid #ddd', 'borderRadius': '5px', 
+              'padding': '12px', 'backgroundColor': '#f9f9f9', 'width': '95%'}
+    )
+
 @app.callback(
     Output('dice-container', 'children'),
     Input('dice-store', 'data')
@@ -161,68 +223,7 @@ def render_dice(dice_data):
     dice_elements = []
 
     for i, die in enumerate(dice_data):
-        # ---------- side inputs ----------
-        side_inputs = [
-            dcc.Input(
-                type='number',
-                value=value,
-                id={'type': 'side-value-input', 'index': i, 'side': j},
-                style={
-                    'width': '50px',
-                    'textAlign': 'center',
-                    'marginRight': '8px',
-                    'marginBottom': '5px'
-                }
-            )
-            for j, value in enumerate(die['values'])
-        ]
-
-        # ---------- die card ----------
-        die_card = html.Div([
-            # Header row
-            html.Div([
-                html.Strong(f'Die #{i+1}', style={'minWidth': '60px'}),
-
-                html.Div([
-                    html.Label('Sides:', style={'marginRight': '5px', 'fontSize': '14px'}),
-                    dcc.Input(
-                        type='number',
-                        min=1,
-                        max=100,
-                        value=die['sides'],
-                        id={'type': 'sides-input', 'index': i},
-                        style={'width': '60px'}
-                    )
-                ], style={'display': 'flex', 'alignItems': 'center', 'marginLeft': '20px'}),
-
-                html.Button('×',
-                            id={'type': 'remove-die-btn', 'index': i},
-                            style={'marginLeft': 'auto',
-                                   'color': 'red',
-                                   'cursor': 'pointer',
-                                   'fontSize': '16px'})
-            ], style={
-                'display': 'flex',
-                'alignItems': 'center',
-                'borderBottom': '1px solid #eee',
-                'paddingBottom': '8px',
-                'marginBottom': '8px'
-            }),
-
-            # Side values
-            html.Div(side_inputs,
-                     style={'display': 'flex',
-                            'flexWrap': 'wrap',
-                            'overflowX': 'auto',
-                            'paddingTop': '5px'})
-        ], style={
-            'border': '1px solid #ddd',
-            'borderRadius': '5px',
-            'padding': '12px',
-            'backgroundColor': '#f9f9f9',
-            'width': '95%',
-        })
-
+        die_card = render_die(i, die)
         dice_elements.append(die_card)
 
     return dice_elements
@@ -246,42 +247,59 @@ def render_dice(dice_data):
     State('replace-highest-toggle', 'value'),
     State('replace-highest-value', 'value'),
 )
-def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest, drop_highest, drop_lowest_stat, drop_highest_stat,
-                 replace_lowest_bool, replace_lowest_value, replace_highest_bool, replace_highest_value):
+def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest,
+                 drop_highest, drop_lowest_stat, drop_highest_stat,
+                 replace_lowest_bool, replace_lowest_value, 
+                 replace_highest_bool, replace_highest_value):
+    # exit if malformed
     if not dice_data:
         return html.Div("No dice to roll!", style={'color': 'red'})
-
     if drop_lowest + drop_highest >= len(dice_data):
         return html.Div("Dropping too many Dice!", style={'color': 'red'})
 
+    # parse dice data, and get roll probabilities
     dice = [die['values'] for die in dice_data]
-
     roll_probs, roll_cprobs = calculate_roll(dice, drop_lowest, drop_highest)
 
+    # build roll graphs
+    fig_rp = dcc.Graph('probs',
+                       figure=plot(roll_probs,
+                                   title='Roll Probabilities'))
+    fig_crp = dcc.Graph('cprobs',
+                        figure=plot(roll_cprobs,
+                                    title='Cumulative Roll Probailites',
+                                    moments=False))
+
     if not stat_enable:
-        return [html.Div(dcc.Graph('probs', figure=plot(roll_probs, title='Roll Probabilities')),
-                    style={'padding': '12px', 'width': '95%'}),
-                html.Div(dcc.Graph('cprobs', figure=plot(roll_cprobs, title='Cumulative Roll Probailites', moments=False)),
-                    style={'padding': '12px', 'width': '95%'})], \
+        return [html.Div(fig_rp, style={'padding': '12px', 'width': '95%'}),
+                html.Div(fig_crp, style={'padding': '12px', 'width': '95%'})], \
                None, \
                None
 
+    # get stat probabilities
     stat_probs, roll_probs_mod, roll_cprobs_mod = calculate_stats(
-                                                    roll_probs, z,
-                                                    drop_lowest_stat, drop_highest_stat,
-                                                    replace_lowest_bool, replace_lowest_value,
-                                                    replace_highest_bool, replace_highest_value)
+        roll_probs, z, drop_lowest_stat, drop_highest_stat,
+        replace_lowest_bool, replace_lowest_value,
+        replace_highest_bool, replace_highest_value
+    )
 
-    return [html.Div(dcc.Graph('probs', figure=plot(roll_probs, title='Roll Probabilities')),
-                style={'padding': '12px', 'width': '95%'}),
-            html.Div(dcc.Graph('cprobs', figure=plot(roll_cprobs, title='Cumulative Roll Probailites', moments=False)),
-                style={'padding': '12px', 'width': '95%'})], \
-           [html.Div(dcc.Graph('probs_mod', figure=plot(roll_probs_mod, title='Modified Roll Probabilities')),
-                style={'padding': '12px', 'width': '95%'}),
-            html.Div(dcc.Graph('stats', figure=plot(roll_cprobs_mod, title='Cumulative Modified Roll Probailites', moments=False)),
-                style={'padding': '12px', 'width': '95%',})], \
-           [html.Div(dcc.Graph('stats', figure=plot(stat_probs, title='Stat Total Probailites')),
-                style={'padding': '12px', 'width': '95%',})]
+    # build stat graphs
+    fig_rpm = dcc.Graph('probs_mod', 
+                        figure=plot(roll_probs_mod, 
+                                    title='Modified Roll Probabilities'))
+    fig_crpm = dcc.Graph('cprobs_mod', 
+                         figure=plot(roll_cprobs_mod, 
+                                     title='Cumulative Modified Roll Probailites', 
+                                     moments=False))
+    fig_stat = dcc.Graph('stats', 
+                         figure=plot(stat_probs,
+                                     title='Stat Total Probailites'))
+
+    return [html.Div(fig_rp, style={'paddinging': '12px', 'width': '95%'}),
+            html.Div(fig_crp, style={'padding': '12px', 'width': '95%'})], \
+           [html.Div(fig_rpm, style={'padding': '12px', 'width': '95%'}),
+            html.Div(fig_crpm, style={'padding': '12px', 'width': '95%',})], \
+           [html.Div(fig_stat, style={'padding': '12px', 'width': '95%',})]
 
 
 if __name__ == '__main__':
