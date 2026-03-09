@@ -90,7 +90,6 @@ app.layout = html.Div([
 ])
 
 
-# Single callback to handle ALL modifications to dice store
 @app.callback(
     Output('dice-store', 'data'),
     Input('add-die-btn', 'n_clicks'),
@@ -103,6 +102,20 @@ app.layout = html.Div([
 )
 def update_dice_store(add_clicks, remove_clicks, sides_values, 
                       side_values, current_data, new_die_sides):
+    '''
+    function to update the dice pool. Add, drop, mutate, ...
+
+    Parameters:
+        add_clicks (bool): trigger to add a die
+        remove_clicks (bool): trigger to remove die
+        sides_values (int): num sides of new die (not custom)
+        side_values (list): list of side values for custom die
+        current_data (list): list of current die and data
+        new_die_sides (int): change the number of sides in the pool
+
+    Returns:
+        current_data (list): updated list of current die and data
+    '''
     if not ctx.triggered:
         return current_data
 
@@ -171,6 +184,18 @@ def update_dice_store(add_clicks, remove_clicks, sides_values,
 
 
 def render_die(i, die):
+    '''
+    function to render a die in the dice pool
+
+    Parameters:
+        i (int): die id in dice pool
+        die (dict): die object
+            sides (int): number of sides of a die
+            values (list): face values of a die
+
+    Returns:
+        out (dash.html.Div): rendered die
+    '''
     # build UI to for each side of a die
     side_inputs = [
         dcc.Input(type='number',
@@ -231,7 +256,6 @@ def render_dice(dice_data):
     return dice_elements
 
 
-# Roll the dice pool
 @app.callback(
     Output('roll-results', 'children'),
     Output('roll-mod-results', 'children'),
@@ -251,8 +275,28 @@ def render_dice(dice_data):
 )
 def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest,
                  drop_highest, drop_lowest_stat, drop_highest_stat,
-                 replace_lowest_bool, replace_lowest_value, 
+                 replace_lowest_bool, replace_lowest_value,
                  replace_highest_bool, replace_highest_value):
+    '''
+    function to run rool/stat app Calculations
+
+    Parameters:
+        n_clicks (int): trigger to run function
+        dice_data (list): die pool
+        stat_enable (bool): bool if to run rolls and stats or just stats
+        z (int): number of stats
+        drop_lowest (int): number of lowest value die to drop from a roll
+        drop_highest (int): number of highest values die to drop from a roll
+        drop_lowest_stat (int): number of lowest stats to drop
+        drop_highest_stat (int): number of highest stats to drop
+        replace_lowest_bool (bool): toggle replacing lowest stat
+        replace_lowest_value (int): lowest replacement value (if enabled)
+        replace_highest_bool (bool): toggle replacing highest stat
+        replace_highest_value (int): highest replacement value (if enabled)
+
+    Returns:
+        plots (list): list of plots (or None if some are disabled)
+    '''
     # exit if malformed
     if not dice_data:
         return html.Div("No dice to roll!", style={'color': 'red'})
