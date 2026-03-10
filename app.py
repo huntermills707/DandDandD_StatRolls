@@ -5,12 +5,12 @@ from dash import html, dcc, Input, Output, State, ALL, ctx
 
 from stats import calculate_roll, calculate_stats
 from plots import plot
+from theory import theory
+
 
 app = dash.Dash(__name__)
 
-app.layout = html.Div([
-    html.H1("Dice Pool Probabilities"), 
-
+tab1 = dcc.Tab(label='Dice Probabilities', children=[
     # dice store (default 4d6)
     dcc.Store(id='dice-store', data=[{'sides': 6, 'values': [1,2,3,4,5,6]},
                                      {'sides': 6, 'values': [1,2,3,4,5,6]},
@@ -37,7 +37,7 @@ app.layout = html.Div([
     # Stat Controls
     html.Div([
      html.Label('Enable Stat Outcome Calculations:',
-                style={'marginRight': '5px', 'font-size': '20px', 'font-weight': 'bold'}),
+                style={'marginRight': '5px', 'font-size': '15px', 'font-weight': 'bold'}),
      dcc.Checklist(id='stat-toggle', options=[''], value=['']),
     ], style={'marginBottom': '20px', 'display': 'flex', 'alignItems': 'center'}),
     html.Div([
@@ -67,26 +67,33 @@ app.layout = html.Div([
                 'gap': '15px',
                 'alignItems': 'start'}),
 
-    # roll results display
+    # result plots
     html.Div(id='roll-results',
             style={'display': 'grid',
                 'gridTemplateColumns': 'repeat(2, 1fr)',
                 'gap': '15px',
                 'alignItems': 'start'}),
-
-    # modified roll results display
     html.Div(id='roll-mod-results',
             style={'display': 'grid',
                 'gridTemplateColumns': 'repeat(2, 1fr)',
                 'gap': '15px',
                 'alignItems': 'start'}),
-
-    # stat results display
     html.Div(id='stat-results',
             style={'display': 'grid',
                 'gridTemplateColumns': 'repeat(1, 1fr)',
                 'gap': '15px',
                 'alignItems': 'start'}),
+])
+
+tab2 = dcc.Tab(label='Theory', children=[
+    html.Div([
+        dcc.Markdown(theory, mathjax=True)
+    ], style={'padding': '15px'})
+])
+
+app.layout = html.Div([
+    html.H1("Dice Pool Probabilities"), 
+    dcc.Tabs([tab1, tab2], style={"marginTop": "5px"})
 ])
 
 
