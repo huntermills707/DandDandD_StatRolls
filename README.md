@@ -11,11 +11,7 @@ This tool attempts to arm DMs with knowledge of how stats are distributed during
 1. **Individual Stat Probabilities:** This plots the probability of rolling any given stat (multiply by 100 for percent)
 2. **Cumulative Stat Probabilities:** This plots the probability of the value of all stats added together (multiply by 100 for percent)
 
-Both graphics also include the following statistical measures (not to be confused with character stats):
-1. **Mean:** This is a measure of what the average outcome would be from the stat generation
-2. **Standard Deviation:** This measure how widely results vary. A larger value means it varies more, and a smaller value varies less.
-3. **Skewness:** This measure the shape of the results. Roughly, if the peak of the curve is greater than the mean, the skew is negative, and if the peak of the curve is less than the mean, the skew is positive. In the case where the peak is the mean, the skew is zero.
-4. **Kurtosis:** This measure how the rate of how often values that significantly deviate from the mean occur (outliers). Higher values yield more outliers.
+Plots also display basic descriptive statistics: mean, standard deviation, skewness, and kurtosis.
 
 ---
 
