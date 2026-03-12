@@ -1,6 +1,10 @@
 # Dungeon and Dragons Stat Simulator
 
+3/12/26 -- PyCafe is down.
 [![py.cafe](https://py.cafe/logos/pycafe_logo.png)](https://py.cafe/app/huntermills707/dash-dice-roll-probability) <-- Py.Cafe Demo 
+
+
+[![render.com](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjp6Ur7pViL-Ggg0oJmlXDDTT3IiIbVUpNfQ&s)](https://danddandd-statrolls.onrender.com/) <-- Render Demo (hobby tier -- much slower than running locally)
 
 There are many variations of house rules in regard to stat generation in Dungeons and Dragons.
 Each variant has a different effect on how stats are distributed among PCs and NPCs assuming the stats are generated randomly (IE not via point buy). These house rules can have a significant effect on gameplay because these stats directly affect in-game roll modifiers. Some variants may be highly variable, so some PCs could be significantly weaker than others. This could be fun, but it does depend on play style.
