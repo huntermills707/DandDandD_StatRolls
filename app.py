@@ -8,7 +8,9 @@ from plots import plot
 from theory import theory
 
 
+# Initialize Dash app
 app = dash.Dash(__name__)
+server = app.server
 
 tab1 = dcc.Tab(label='Dice Probabilities', children=[
     # dice store (default 4d6)
@@ -356,4 +358,4 @@ def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest,
 
 
 if __name__ == '__main__':
-    app.run(port=8050, host='0.0.0.0')
+    app.run(debug=False, threaded=True, port=8050)

@@ -1,2 +1,3 @@
-dash
-plotly
+dash==4.0.0
+plotly==6.5.2
+gunicorn==25.1.0
