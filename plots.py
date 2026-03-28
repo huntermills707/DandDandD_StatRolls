@@ -36,7 +36,7 @@ def make_annotation(probs, y_top, label_prefix=''):
         bordercolor='black',
         borderwidth=1,
         borderpad=4,
-        bgcolor='rgba(255,255,255,0.85)',
+        bgcolor='rgba(255,255,255,0.25)',
     )
 
 
