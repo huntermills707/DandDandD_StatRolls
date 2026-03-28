@@ -3,7 +3,6 @@ import plotly.graph_objects as go
 from moments import calculate_moments
 
 
-
 # Height of one text line in paper (y) coordinates for a 400px plot.
 # 5 lines (1 label + 4 metrics) × this value gives the vertical span of box 1.
 _LINE_HEIGHT_PAPER = 0.062
