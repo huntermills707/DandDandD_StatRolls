@@ -33,8 +33,8 @@ app.clientside_callback(
     f'''
     function(win_width) {{
         var narrow = (win_width || 1200) < {NARROW_WIDTH};
-        var two_col  = {{display: 'grid', gridTemplateColumns: narrow ? 'repeat(1, 1fr)' : 'repeat(2, 1fr)', gap: '15px', alignItems: 'start'}};
-        var one_col  = {{display: 'grid', gridTemplateColumns: 'repeat(1, 1fr)',                              gap: '15px', alignItems: 'start'}};
+        var two_col  = {{display: 'grid', gridTemplateColumns: narrow ? 'repeat(1, 1fr)' : 'repeat(2, 1fr)', gap: '15px', alignItems: 'stretch'}};
+        var one_col  = {{display: 'grid', gridTemplateColumns: 'repeat(1, 1fr)',                              gap: '15px', alignItems: 'stretch'}};
         return [two_col, two_col, one_col];
     }}
     ''',
@@ -307,16 +307,16 @@ def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest,
     roll_probs, roll_cprobs = calculate_roll(dice, drop_lowest, drop_highest)
 
     gs = {'width': '95%'}       # graph fills its grid cell
-    ds = {'padding': '12px', 'width': '100%', 'minWidth': 0}  # wrapper
+    ds = {'padding': '12px', 'width': '100%', 'minWidth': 0, 'height': '400px'}  # wrapper
 
     if not stat_enable:
-        fig_rp  = dcc.Graph('probs',  figure=plot(roll_probs,
-                                                   title='Roll Probabilities'),
-                             responsive=True, style=gs)
-        fig_crp = dcc.Graph('cprobs', figure=plot(roll_cprobs,
-                                                   title='Cumulative Roll Probabilities',
-                                                   moments=False),
-                             responsive=True, style=gs)
+        fig_rp  = dcc.Graph(figure=plot(roll_probs,
+                                         title='Roll Probabilities'),
+                             style=gs)
+        fig_crp = dcc.Graph(figure=plot(roll_cprobs,
+                                         title='Cumulative Roll Probabilities',
+                                         moments=False),
+                             style=gs)
         return ([html.Div(fig_rp,  style=ds),
                  html.Div(fig_crp, style=ds)],
                 None)
@@ -329,29 +329,29 @@ def stat_results(n_clicks, dice_data, stat_enable, z, drop_lowest,
     )
 
     # Pair 1: base roll probs + modified roll probs overlaid
-    fig_rp = dcc.Graph('probs', figure=plot(
+    fig_rp = dcc.Graph(figure=plot(
         roll_probs,
         title='Roll Probabilities',
         probs2=roll_probs_mod,
         label1='Base Roll',
         label2='Modified Roll',
-    ), responsive=True, style=gs)
+    ), style=gs)
 
     # Pair 2: cumulative base + cumulative modified overlaid
-    fig_crp = dcc.Graph('cprobs', figure=plot(
+    fig_crp = dcc.Graph(figure=plot(
         roll_cprobs,
         title='Cumulative Roll Probabilities',
         moments=False,
         probs2=roll_cprobs_mod,
         label1='Base Roll',
         label2='Modified Roll',
-    ), responsive=True, style=gs)
+    ), style=gs)
 
     # Chart 3: stat totals
-    fig_stat = dcc.Graph('stats', figure=plot(
+    fig_stat = dcc.Graph(figure=plot(
         stat_probs,
         title='Stat Total Probabilities',
-    ), responsive=True, style=gs)
+    ), style=gs)
 
     return ([html.Div(fig_rp,  style=ds),
              html.Div(fig_crp, style=ds)],
